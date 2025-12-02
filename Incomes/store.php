@@ -1,13 +1,10 @@
 <?php
 include "../Includes/db.php";
-$id = $_GET["id"];
 $amount = $_POST["amount"];
 $description = $_POST["description"];
 $date = $_POST["date"];
-
-$stmt = $pdo->prepare("UPDATE incomes SET amount=?, description=?, date=? WHERE id=?");
-$stmt->execute([$amount, $description, $date, $id]);
-
+$stmt = $pdo->prepare("INSERT INTO incomes (amount, description, date) VALUES (?, ?, ?)");
+$stmt->execute([$amount, $description, $date]);
 header("Location: index.php");
 exit;
 ?>
