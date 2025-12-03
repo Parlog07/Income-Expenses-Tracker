@@ -60,7 +60,8 @@ $incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <form method="POST" action="store.php" class="space-y-4">
-      <div>
+
+        <div>
         <label class="block text-sm">Amount</label>
         <input name="amount" type="number" step="0.01" required class="w-full border p-2 rounded">
       </div>
