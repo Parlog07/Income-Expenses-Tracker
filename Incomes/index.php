@@ -1,8 +1,8 @@
 <?php
 include "../Includes/db.php";
 include "../Includes/layout.php";
-require_once "Includes/auth.php";
-
+require_once "../Includes/auth.php";
+require_once "../Includes/db.php";
 $user_id = $_SESSION["user_id"];
 $stmt = $pdo->prepare("SELECT * FROM incomes WHERE user_id = ? ORDER BY date DESC, id DESC");
 $stmt->execute([$user_id]);
