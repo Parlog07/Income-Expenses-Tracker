@@ -37,6 +37,8 @@
     </svg>
     Expenses
   </a>
+  <a href="auth/logout.php">Logout</a>
+
 </nav>
     </aside>
     <main id="main-content" class="flex-1 p-8">

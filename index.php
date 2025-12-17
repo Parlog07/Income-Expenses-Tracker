@@ -1,5 +1,7 @@
 <?php
 include "Includes/db.php";
+require_once "Includes/auth.php";
+
 
 // TOTAL INCOME
 $stmt = $pdo->prepare("SELECT SUM(amount) AS total_income FROM incomes");

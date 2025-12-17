@@ -2,11 +2,12 @@
 
 include "../Includes/db.php";
 include "../Includes/layout.php";
+require_once "Includes/auth.php";
 
-$stmt = $pdo->prepare("SELECT * FROM expenses ORDER BY date DESC, id DESC");
-$stmt->execute();
-$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+$user_id = $_SESSION["user_id"];
+$stmt = $pdo->prepare("SELECT * FROM incomes WHERE user_id = ? ORDER BY date DESC, id DESC");
+$stmt->execute([$user_id]);
+$incomes = $stmt->fetchAll(PDO::FETCH_ASSOC); 
 
 ?>
 
@@ -50,7 +51,7 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </table>
 </div>
 
-<div id="addExpenseModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/40">
+<div id="addExpenseModal" class="fixed inset-0 z-40 hidden flex items-center justify-center bg-black/40">
   <div class="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-bold">Add Expense</h3>
@@ -81,7 +82,7 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </div>
 
-<div id="editExpenseModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/40">
+<div id="editExpenseModal" class="fixed inset-0 z-40 hidden flex items-center justify-center bg-black/40">
   <div class="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-bold">Edit Expense</h3>
