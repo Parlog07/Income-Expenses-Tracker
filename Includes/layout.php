@@ -16,28 +16,51 @@
         <h1 class="text-2xl font-extrabold text-blue-600">Smart Wallet</h1>
       </a>
       <nav class="space-y-2">
+
   <a href="/php/Income-Expenses-Tracker/index.php" 
      class="flex items-center gap-3 rounded px-3 py-2 hover:bg-blue-50">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-6 9 6v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2z" />
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none"
+         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 9l9-6 9 6v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2z" />
     </svg>
     Dashboard
   </a>
+
   <a href="/php/Income-Expenses-Tracker/Incomes/index.php" 
      class="flex items-center gap-3 rounded px-3 py-2 hover:bg-blue-50">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none"
+         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
     </svg>
     Incomes
   </a>
+
   <a href="/php/Income-Expenses-Tracker/Expenses/index.php" 
      class="flex items-center gap-3 rounded px-3 py-2 hover:bg-blue-50">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none"
+         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12" />
     </svg>
     Expenses
   </a>
-  <a href="auth/logout.php">Logout</a>
+
+  <!-- ✅ NEW CARDS BUTTON -->
+  <a href="/php/Income-Expenses-Tracker/Cards/index.php" 
+     class="flex items-center gap-3 rounded px-3 py-2 hover:bg-blue-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none"
+         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 7.5h19.5m-19.5 3h19.5m-19.5 6h19.5" />
+    </svg>
+    Cards
+  </a>
+
+  <a href="/php/Income-Expenses-Tracker/auth/logout.php" 
+     class="flex items-center gap-3 rounded px-3 py-2 text-gray-500 hover:bg-red-50 hover:text-red-600">
+    Logout
+  </a>
 
 </nav>
     </aside>
