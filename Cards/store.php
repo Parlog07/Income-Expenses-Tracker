@@ -2,23 +2,22 @@
 require_once "../Includes/auth.php";
 require_once "../Includes/db.php";
 
-$name = trim($_POST['name'] ?? '');
-$is_main = isset($_POST['is_main']) ? 1 : 0;
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION["user_id"];
+$name = trim($_POST["name"]);
 
-if ($name === '') {
-    header("Location: index.php?error=Name required");
+if ($name === "") {
+    header("Location: index.php");
     exit;
 }
 
-if ($is_main) {
-    $stmt = $pdo->prepare("
-        UPDATE cards 
-        SET is_main = 0 
-        WHERE user_id = ?
-    ");
-    $stmt->execute([$user_id]);
-}
+// First card becomes main automatically
+$stmt = $pdo->prepare("
+    SELECT COUNT(*) FROM cards WHERE user_id = ?
+");
+$stmt->execute([$user_id]);
+$hasCards = $stmt->fetchColumn();
+
+$is_main = $hasCards == 0 ? 1 : 0;
 
 $stmt = $pdo->prepare("
     INSERT INTO cards (user_id, name, is_main)

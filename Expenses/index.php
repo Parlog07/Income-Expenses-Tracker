@@ -5,34 +5,30 @@ include "../Includes/layout.php";
 
 $user_id = $_SESSION["user_id"];
 
-/* =========================
-   FETCH EXPENSES
-   ========================= */
 $stmt = $pdo->prepare("
-    SELECT * 
-    FROM expenses 
-    WHERE user_id = ? 
-    ORDER BY date DESC, id DESC
-");
-$stmt->execute([$user_id]);
-$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/* =========================
-   FETCH USER CARDS (STEP 4)
-   ========================= */
-$stmt = $pdo->prepare("
-    SELECT id, name 
-    FROM cards 
+    SELECT id, name, is_main
+    FROM cards
     WHERE user_id = ?
-    ORDER BY is_main DESC, created_at ASC
 ");
 $stmt->execute([$user_id]);
 $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+$stmt = $pdo->prepare("
+    SELECT expenses.*, cards.name AS card_name
+    FROM expenses
+    JOIN cards ON expenses.card_id = cards.id
+    WHERE expenses.user_id = ?
+    ORDER BY expenses.date DESC, expenses.id DESC
+");
+$stmt->execute([$user_id]);
+$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="flex items-center justify-between mb-6">
   <h2 class="text-2xl font-bold">Expenses</h2>
-  <button id="openAddExpense" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+  <button id="openAddExpense"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
     + Add Expense
   </button>
 </div>
@@ -44,40 +40,43 @@ $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <th class="px-4 py-3 text-left text-sm">ID</th>
         <th class="px-4 py-3 text-left text-sm">Amount</th>
         <th class="px-4 py-3 text-left text-sm">Description</th>
+        <th class="px-4 py-3 text-left text-sm">Card</th>
         <th class="px-4 py-3 text-left text-sm">Date</th>
         <th class="px-4 py-3 text-left text-sm">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y">
       <?php foreach ($expenses as $expense): ?>
-      <tr class="hover:bg-gray-50">
-        <td class="px-4 py-3"><?= htmlspecialchars($expense['id']) ?></td>
-        <td class="px-4 py-3"><?= htmlspecialchars($expense['amount']) ?> MAD</td>
-        <td class="px-4 py-3"><?= htmlspecialchars($expense['description']) ?></td>
-        <td class="px-4 py-3"><?= htmlspecialchars($expense['date']) ?></td>
-        <td class="px-4 py-3">
-          <button
-            class="edit-btn text-blue-600 hover:underline mr-3"
-            data-id="<?= $expense['id'] ?>"
-            data-amount="<?= htmlspecialchars($expense['amount']) ?>"
-            data-description="<?= htmlspecialchars($expense['description']) ?>"
-            data-date="<?= htmlspecialchars($expense['date']) ?>"
-          >Edit</button>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3"><?= htmlspecialchars($expense["id"]) ?></td>
+          <td class="px-4 py-3"><?= number_format($expense["amount"], 2) ?> MAD</td>
+          <td class="px-4 py-3"><?= htmlspecialchars($expense["description"]) ?></td>
+          <td class="px-4 py-3"><?= htmlspecialchars($expense["card_name"]) ?></td>
+          <td class="px-4 py-3"><?= htmlspecialchars($expense["date"]) ?></td>
+          <td class="px-4 py-3">
+            <button
+              class="edit-btn text-blue-600 hover:underline mr-3"
+              data-id="<?= $expense['id'] ?>"
+              data-amount="<?= $expense['amount'] ?>"
+              data-description="<?= htmlspecialchars($expense['description']) ?>"
+              data-date="<?= $expense['date'] ?>"
+              data-card="<?= $expense['card_id'] ?>"
+            >Edit</button>
 
-          <a href="delete.php?id=<?= $expense['id'] ?>"
-             class="text-red-600 hover:underline"
-             onclick="return confirm('Delete this expense?');">
-             Delete
-          </a>
-        </td>
-      </tr>
+            <a href="delete.php?id=<?= $expense['id'] ?>"
+               class="text-red-600 hover:underline"
+               onclick="return confirm('Delete this expense?');">
+              Delete
+            </a>
+          </td>
+        </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
 </div>
 
 <!-- =========================
-     ADD EXPENSE MODAL
+     ADD MODAL
      ========================= -->
 <div id="addModal" class="fixed inset-0 z-40 hidden flex items-center justify-center bg-black/40">
   <div class="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
@@ -87,8 +86,6 @@ $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <form method="POST" action="store.php" class="space-y-4">
-
-      <!-- CARD SELECT (STEP 4) -->
       <div>
         <label class="block text-sm">Card</label>
         <select name="card_id" required class="w-full border p-2 rounded">
@@ -96,6 +93,7 @@ $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <?php foreach ($cards as $card): ?>
             <option value="<?= $card['id'] ?>">
               <?= htmlspecialchars($card['name']) ?>
+              <?= $card['is_main'] ? '(Main)' : '' ?>
             </option>
           <?php endforeach; ?>
         </select>
@@ -134,7 +132,9 @@ $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <button id="closeEdit" class="text-gray-500">&times;</button>
     </div>
 
-    <form id="editForm" method="POST" action="">
+    <form id="editForm" method="POST">
+      <input type="hidden" name="card_id" id="editCard">
+
       <div>
         <label class="block text-sm">Amount</label>
         <input id="editAmount" name="amount" type="number" step="0.01" required class="w-full border p-2 rounded">
@@ -168,23 +168,23 @@ const hide = el => el.classList.add('hidden');
 
 // Add modal
 const addModal = document.getElementById('addModal');
-document.getElementById('openAddExpense').addEventListener('click', () => show(addModal));
+document.getElementById('openAddExpense').onclick = () => show(addModal);
 ['closeAdd','closeAdd2'].forEach(id =>
-  document.getElementById(id).addEventListener('click', () => hide(addModal))
+  document.getElementById(id).onclick = () => hide(addModal)
 );
 
 // Edit modal
 const editModal = document.getElementById('editModal');
 document.querySelectorAll('.edit-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.onclick = () => {
     document.getElementById('editAmount').value = btn.dataset.amount;
     document.getElementById('editDescription').value = btn.dataset.description;
     document.getElementById('editDate').value = btn.dataset.date;
     document.getElementById('editForm').action = `update.php?id=${btn.dataset.id}`;
     show(editModal);
-  });
+  };
 });
 ['closeEdit','closeEdit2'].forEach(id =>
-  document.getElementById(id).addEventListener('click', () => hide(editModal))
+  document.getElementById(id).onclick = () => hide(editModal)
 );
 </script>
