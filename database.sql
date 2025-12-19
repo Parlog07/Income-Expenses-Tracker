@@ -1,4 +1,4 @@
--- Active: 1764673028424@@127.0.0.1@3306@smart-walet
+-- Active: 1764673028424@@127.0.0.1@3306@smart-wallet
 create table incomes(
     id INT AUTO_INCREMENT PRIMARY KEY,
     amount DECIMAL(10,2) NOT NULL,
@@ -24,11 +24,19 @@ ALTER TABLE expenses ADD user_id INT NOT NULL;
 CREATE TABLE cards (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    is_main BOOLEAN DEFAULT 0,
+    provider VARCHAR(100) NOT NULL,
+    card_last4 VARCHAR(4) NOT NULL,
+    limit_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    expiry_date DATE NOT NULL,
+    is_main TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+    CONSTRAINT fk_cards_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 );
+
 
 
 ALTER TABLE incomes ADD card_id INT NOT NULL;
@@ -41,3 +49,4 @@ CREATE TABLE transfers (
     amount DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
