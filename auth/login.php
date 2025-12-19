@@ -9,51 +9,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
-    // Validation
     if (empty($email)) {
         $errors[] = "Email is required";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Invalid email format";
     }
+
     if (empty($password)) {
         $errors[] = "Password is required";
     }
+
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
+        if (!$user || !password_verify($password, $user["password"])) {
             $errors[] = "Invalid email or password";
         }
     }
-    // Verify password
-    if (empty($errors)) {
-        if (!password_verify($password, $user["password"])) {
-            $errors[] = "Invalid email or password";
-        }
-    }
-    // OTP
+
+
     if (empty($errors)) {
 
-        // Generate OTP
-        $otp = rand(100000, 999999);
+        $otp = random_int(100000, 999999);
 
-        // Store OTP data in session
         $_SESSION["otp"] = $otp;
+        $_SESSION["otp_expires"] = time() + 300; 
         $_SESSION["otp_user_id"] = $user["id"];
-        $_SESSION["otp_user_name"] = $user["full_name"];
-        $_SESSION["otp_expires"] = time() + 300; // 5 minutes
 
-        // Send OTP by email
-        mail(
-            $user["email"],
-            "Your Login OTP Code",
-            "Hello {$user['full_name']},\n\nYour OTP code is: $otp\nThis code expires in 5 minutes.\n\nIf this wasn't you, please ignore this email."
-        );
+        $to = $user["email"];
+        $subject = "Your OTP Code";
+        $message = "Your OTP code is: $otp\n\nThis code expires in 5 minutes.";
+        $headers = "From: Smart Wallet <no-reply@smartwallet.local>";
 
-        // Redirect to OTP verification page
-        header("Location: verify-otp.php");
+        mail($to, $subject, $message, $headers);
+
+        header("Location: verify_otp.php");
         exit;
     }
 }

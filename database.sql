@@ -20,3 +20,24 @@ CREATE TABLE users (
 );
 ALTER TABLE incomes ADD user_id INT NOT NULL;
 ALTER TABLE expenses ADD user_id INT NOT NULL;
+
+CREATE TABLE cards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    is_main BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+ALTER TABLE incomes ADD card_id INT NOT NULL;
+ALTER TABLE expenses ADD card_id INT NOT NULL;
+
+CREATE TABLE transfers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
