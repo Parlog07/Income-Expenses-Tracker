@@ -5,17 +5,25 @@ include "../Includes/layout.php";
 
 $user_id = $_SESSION["user_id"];
 
+/* =========================
+   FETCH USER CARDS
+   ========================= */
 $stmt = $pdo->prepare("
-    SELECT id, name, is_main
+    SELECT id, provider, is_main
     FROM cards
     WHERE user_id = ?
 ");
 $stmt->execute([$user_id]);
 $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
+/* =========================
+   FETCH EXPENSES + CARD INFO
+   ========================= */
 $stmt = $pdo->prepare("
-    SELECT expenses.*, cards.name AS card_name
+    SELECT 
+        expenses.*,
+        cards.provider AS card_provider,
+        cards.card_last4
     FROM expenses
     JOIN cards ON expenses.card_id = cards.id
     WHERE expenses.user_id = ?
@@ -48,10 +56,13 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <tbody class="divide-y">
       <?php foreach ($expenses as $expense): ?>
         <tr class="hover:bg-gray-50">
-          <td class="px-4 py-3"><?= htmlspecialchars($expense["id"]) ?></td>
+          <td class="px-4 py-3"><?= $expense["id"] ?></td>
           <td class="px-4 py-3"><?= number_format($expense["amount"], 2) ?> MAD</td>
           <td class="px-4 py-3"><?= htmlspecialchars($expense["description"]) ?></td>
-          <td class="px-4 py-3"><?= htmlspecialchars($expense["card_name"]) ?></td>
+          <td class="px-4 py-3">
+            <?= htmlspecialchars($expense["card_provider"]) ?>
+            ••••<?= htmlspecialchars($expense["card_last4"]) ?>
+          </td>
           <td class="px-4 py-3"><?= htmlspecialchars($expense["date"]) ?></td>
           <td class="px-4 py-3">
             <button
@@ -92,7 +103,7 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <option value="">-- Select card --</option>
           <?php foreach ($cards as $card): ?>
             <option value="<?= $card['id'] ?>">
-              <?= htmlspecialchars($card['name']) ?>
+              <?= htmlspecialchars($card['provider']) ?>
               <?= $card['is_main'] ? '(Main)' : '' ?>
             </option>
           <?php endforeach; ?>
