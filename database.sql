@@ -42,11 +42,23 @@ CREATE TABLE cards (
 ALTER TABLE incomes ADD card_id INT NOT NULL;
 ALTER TABLE expenses ADD card_id INT NOT NULL;
 
-CREATE TABLE transfers (
+CREATE TABLE transfer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
+    sender_card_id INT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    CONSTRAINT fk_sender
+        FOREIGN KEY (sender_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_receiver
+        FOREIGN KEY (receiver_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_sender_card
+        FOREIGN KEY (sender_card_id) REFERENCES cards(id)
+        ON DELETE CASCADE
+);

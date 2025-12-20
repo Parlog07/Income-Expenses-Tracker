@@ -42,6 +42,11 @@
          class="flex items-center gap-3 px-3 py-2 rounded hover:bg-red-50">
         ➖ Expenses
       </a>
+      <a href="/php/Income-Expenses-Tracker/Transfers/index.php"
+          class="flex items-center gap-3 rounded px-3 py-2 hover:bg-purple-50">
+          🔁 Transfers
+      </a>
+
 
       <!-- Logout -->
       <a href="/php/Income-Expenses-Tracker/auth/logout.php"
