@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,22 +23,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Verify OTP</title>
+  <meta charset="UTF-8">
+  <title>Verify OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<h2>Verify OTP</h2>
+<div class="bg-white w-full max-w-md p-8 rounded-xl shadow">
+  <h1 class="text-2xl font-bold text-center text-blue-600 mb-2">Smart Wallet</h1>
+  <p class="text-center text-gray-500 mb-6">Enter the OTP sent to your email</p>
 
-<?php if ($error): ?>
-    <p style="color:red"><?= htmlspecialchars($error) ?></p>
-<?php endif; ?>
+  <?php if ($error): ?>
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      <?= htmlspecialchars($error) ?>
+    </div>
+  <?php endif; ?>
 
-<form method="POST">
-    <input type="text" name="otp" placeholder="Enter OTP" required><br><br>
-    <button type="submit">Verify</button>
-</form>
+  <form method="POST" class="space-y-4">
+    <input type="text" name="otp" placeholder="6-digit OTP"
+           class="w-full border p-2 rounded text-center tracking-widest"
+           required>
+
+    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      Verify
+    </button>
+  </form>
+</div>
 
 </body>
 </html>

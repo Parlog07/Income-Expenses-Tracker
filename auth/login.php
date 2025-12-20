@@ -29,21 +29,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-
     if (empty($errors)) {
-
         $otp = random_int(100000, 999999);
 
         $_SESSION["otp"] = $otp;
-        $_SESSION["otp_expires"] = time() + 300; 
+        $_SESSION["otp_expires"] = time() + 300;
         $_SESSION["otp_user_id"] = $user["id"];
 
-        $to = $user["email"];
-        $subject = "Your OTP Code";
-        $message = "Your OTP code is: $otp\n\nThis code expires in 5 minutes.";
-        $headers = "From: Smart Wallet <no-reply@smartwallet.local>";
-
-        mail($to, $subject, $message, $headers);
+        mail(
+            $user["email"],
+            "Your OTP Code",
+            "Your OTP code is: $otp\nThis code expires in 5 minutes.",
+            "From: Smart Wallet <no-reply@smartwallet.local>"
+        );
 
         header("Location: verify_otp.php");
         exit;
@@ -51,27 +49,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <title>Login | Smart Wallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<h2>Login</h2>
+<div class="bg-white w-full max-w-md p-8 rounded-xl shadow">
+  <h1 class="text-2xl font-bold text-center text-blue-600 mb-2">Smart Wallet</h1>
+  <p class="text-center text-gray-500 mb-6">Login to your account</p>
 
-<?php if (!empty($errors)): ?>
-    <ul>
-        <?php foreach ($errors as $error): ?>
-            <li style="color:red"><?= htmlspecialchars($error) ?></li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+  <?php if (!empty($errors)): ?>
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      <?php foreach ($errors as $error): ?>
+        <p><?= htmlspecialchars($error) ?></p>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 
-<form method="POST">
-    <input type="email" name="email" placeholder="Email" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
-</form>
+  <form method="POST" class="space-y-4">
+    <input type="email" name="email" placeholder="Email"
+           class="w-full border p-2 rounded" required>
+
+    <input type="password" name="password" placeholder="Password"
+           class="w-full border p-2 rounded" required>
+
+    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      Login
+    </button>
+  </form>
+
+  <p class="text-center text-sm text-gray-500 mt-4">
+    No account?
+    <a href="register.php" class="text-blue-600 hover:underline">Register</a>
+  </p>
+</div>
 
 </body>
 </html>
