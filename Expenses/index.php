@@ -4,10 +4,9 @@ require_once "../Includes/db.php";
 include "../Includes/layout.php";
 
 $user_id = $_SESSION["user_id"];
+$stmt = $pdo->query("SELECT id, name FROM categories");
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* =========================
-   FETCH USER CARDS
-   ========================= */
 $stmt = $pdo->prepare("
     SELECT id, provider, is_main
     FROM cards
@@ -16,9 +15,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* =========================
-   FETCH EXPENSES + CARD INFO
-   ========================= */
 $stmt = $pdo->prepare("
     SELECT 
         expenses.*,
@@ -86,9 +82,7 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </table>
 </div>
 
-<!-- =========================
-     ADD MODAL
-     ========================= -->
+
 <div id="addModal" class="fixed inset-0 z-40 hidden flex items-center justify-center bg-black/40">
   <div class="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
     <div class="flex justify-between items-center mb-4">
@@ -109,6 +103,17 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <?php endforeach; ?>
         </select>
       </div>
+            <div>
+  <label class="block text-sm">Category</label>
+  <select name="category_id" required class="w-full border p-2 rounded">
+    <option value="">-- Select category --</option>
+    <?php foreach ($categories as $cat): ?>
+      <option value="<?= $cat['id'] ?>">
+        <?= htmlspecialchars($cat['name']) ?>
+      </option>
+    <?php endforeach; ?>
+  </select>
+</div>
 
       <div>
         <label class="block text-sm">Amount</label>
