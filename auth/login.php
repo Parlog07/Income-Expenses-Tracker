@@ -1,5 +1,6 @@
 <?php
 require_once "../Includes/db.php";
+require_once "../Includes/mailer.php";
 session_start();
 
 $errors = [];
@@ -9,6 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
+    // -----------------------
+    // Validation
+    // -----------------------
     if (empty($email)) {
         $errors[] = "Email is required";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -19,6 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Password is required";
     }
 
+    // -----------------------
+    // User check
+    // -----------------------
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
@@ -29,22 +36,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
+    // -----------------------
+    // OTP + EMAIL (PHPMailer)
+    // -----------------------
     if (empty($errors)) {
+
         $otp = random_int(100000, 999999);
 
         $_SESSION["otp"] = $otp;
-        $_SESSION["otp_expires"] = time() + 300;
+        $_SESSION["otp_expires"] = time() + 300; // 5 minutes
         $_SESSION["otp_user_id"] = $user["id"];
 
-        mail(
-            $user["email"],
-            "Your OTP Code",
-            "Your OTP code is: $otp\nThis code expires in 5 minutes.",
-            "From: Smart Wallet <no-reply@smartwallet.local>"
-        );
+        // 🔥 SEND REAL EMAIL (NOT MAILPIT)
+        $sent = sendOTPEmail($user["email"], $otp);
 
-        header("Location: verify_otp.php");
-        exit;
+        if (!$sent) {
+            $errors[] = "Failed to send OTP email. Please try again.";
+        } else {
+            header("Location: verify_otp.php");
+            exit;
+        }
     }
 }
 ?>
