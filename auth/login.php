@@ -10,9 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
-    // -----------------------
-    // Validation
-    // -----------------------
     if (empty($email)) {
         $errors[] = "Email is required";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -23,9 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Password is required";
     }
 
-    // -----------------------
-    // User check
-    // -----------------------
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
@@ -36,9 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // -----------------------
-    // OTP + EMAIL (PHPMailer)
-    // -----------------------
     if (empty($errors)) {
 
         $otp = random_int(100000, 999999);
