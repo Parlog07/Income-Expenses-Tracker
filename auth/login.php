@@ -1,14 +1,20 @@
 <?php
-require_once "../Includes/db.php";
-require_once "../Includes/mailer.php";
 session_start();
+
+require_once "../classes/Database.php";
+require_once "../classes/User.php";
+require_once "../Includes/mailer.php";
 
 $errors = [];
 
+// $db = new Database();
+// $pdo = $db->connect();
+$userModel = new User($pdo);
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
+    $email = trim($_POST["email"] ?? "");
+    $password = $_POST["password"] ?? "";
 
     if (empty($email)) {
         $errors[] = "Email is required";
@@ -21,15 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !password_verify($password, $user["password"])) {
+        $user = $userModel->login($email, $password);
+
+        if (!$user) {
             $errors[] = "Invalid email or password";
         }
     }
-
     if (empty($errors)) {
 
         $otp = random_int(100000, 999999);
@@ -38,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["otp_expires"] = time() + 300; // 5 minutes
         $_SESSION["otp_user_id"] = $user["id"];
 
-        // 🔥 SEND REAL EMAIL (NOT MAILPIT)
         $sent = sendOTPEmail($user["email"], $otp);
 
         if (!$sent) {
